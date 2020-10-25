@@ -8,111 +8,178 @@ import java.util.Set;
  * EMailBuilder.
  */
 public class EMailBuilder {
-    private String subject;
-    private String sender = "Denis";
-    private Set<String> directAddressees = new HashSet<>();
-    private Set<String> copyAddressees = new HashSet<>();
-    private Content content;
 
-    boolean isSubjectFilled;
-    boolean isAddresseeFilled;
-    boolean isCopyAddresseeFilled;
-    boolean isContentBodyFilled;
-    boolean isContentFilled;
-
-    public EMailBuilder newLetter() {
-        return new EMailBuilder();
+    public IFromToBuilder subject(String subject) {
+        return new FromToBuilder(subject);
     }
 
-    public EMailBuilder subject(String subject) {
-        if (!isSubjectFilled) {
+    private class FromToBuilder implements IFromToBuilder {
+        private String subject;
+        private String sender;
+
+        public FromToBuilder(String subject) {
             this.subject = subject;
-            isSubjectFilled = true;
+            this.sender = "Denis";
+        }
+
+        @Override
+        public IFromToBuilder from(String sender) {
+            this.sender = sender;
             return this;
-        } else {
-            throw new RuntimeException("Subject have been already filled");
+        }
+
+        @Override
+        public ICopyToBuilder to(String addressee) {
+            return new CopyToBuilder(subject, sender, addressee);
+        }
+
+        @Override
+        public ICopyToBuilder toAll(String... addressee) {
+            return new CopyToBuilder(subject, sender, addressee);
         }
     }
 
-    public EMailBuilder from(String sender) {
-        this.sender = sender;
-        return this;
-    }
+    private class CopyToBuilder implements ICopyToBuilder {
+        private String subject;
+        private String sender;
+        private Set<String> directAddressees = new HashSet<>();
+        private Set<String> copyAddressees = new HashSet<>();
 
-    public EMailBuilder to(String addressee) {
-        if (isSubjectFilled && !isCopyAddresseeFilled) {
+        public CopyToBuilder(String subject, String sender, String addressee) {
+            this.subject = subject;
+            this.sender = sender;
             this.directAddressees.add(addressee);
-            isAddresseeFilled = true;
-            return this;
-        } else {
-            // Здесь и далее:
-            // можно было бы увеличить вложенность if'ов для каждого из булианов,
-            // чтобы кидать ошибку с текстом какого именно параметра не хватает или о неправильной последовательности заполнения,
-            // но как по мне - это перебор
-            throw new RuntimeException("Subject should be filled or wrong sequence");
         }
-    }
 
-    public EMailBuilder toAll(String... addressees) {
-        if (isSubjectFilled && !isCopyAddresseeFilled) {
+        public CopyToBuilder(String subject, String sender, String... addressees) {
+            this.subject = subject;
+            this.sender = sender;
             this.directAddressees.addAll(Arrays.asList(addressees));
-            isAddresseeFilled = true;
+        }
+
+        @Override
+        public IContentBuilder copyTo(String copyAddressee) {
+            return new ContentBuilder(subject, sender, directAddressees, copyAddressee);
+        }
+
+        @Override
+        public IContentBuilder copyToAll(String... copyAddressees) {
+            return new ContentBuilder(subject, sender, directAddressees, copyAddressees);
+        }
+
+        @Override
+        public ICopyToBuilder to(String addressee) {
+            this.directAddressees.add(addressee);
             return this;
-        } else {
-            throw new RuntimeException("Subject should be filled or wrong sequence");
+        }
+
+        @Override
+        public ICopyToBuilder toAll(String... addressees) {
+            this.directAddressees.addAll(Arrays.asList(addressees));
+            return this;
         }
     }
 
-    public EMailBuilder copyTo(String addressee) {
-        if (isSubjectFilled && isAddresseeFilled && !isContentFilled) {
+    public class ContentBuilder implements IContentBuilder {
+        private String subject;
+        private String sender;
+        private Set<String> directAddressees = new HashSet<>();
+        private Set<String> copyAddressees = new HashSet<>();
+
+        public ContentBuilder(String subject, String sender, String directAddressees) {
+            this.subject = subject;
+            this.sender = sender;
+            this.directAddressees.add(directAddressees);
+        }
+
+        public ContentBuilder(String subject, String sender, Set<String> directAddressees, String copyAddressees) {
+            this.subject = subject;
+            this.sender = sender;
+            this.directAddressees = directAddressees;
+            this.copyAddressees.add(copyAddressees);
+        }
+
+        public ContentBuilder(String subject, String sender, Set<String> directAddressees, String... copyAddressees) {
+            this.subject = subject;
+            this.sender = sender;
+            this.directAddressees = directAddressees;
+            this.copyAddressees.addAll(Arrays.asList(copyAddressees));
+        }
+
+        @Override
+        public IFinalBuilder content(Content content) {
+            return new FinalBuilder(subject, sender, directAddressees, copyAddressees, content);
+        }
+
+        @Override
+        public IContentBuilder copyTo(String addressee) {
             this.copyAddressees.add(addressee);
-            isCopyAddresseeFilled = true;
             return this;
-        } else {
-            throw new RuntimeException("Subject and/or addressee should be filled or wrong sequence");
         }
-    }
 
-    public EMailBuilder copyToAll(String... addressees) {
-        if (isSubjectFilled && isAddresseeFilled && !isContentFilled) {
+        @Override
+        public IContentBuilder copyToAll(String... addressees) {
             this.copyAddressees.addAll(Arrays.asList(addressees));
-            isCopyAddresseeFilled = true;
             return this;
-        } else {
-            throw new RuntimeException("Subject and/or addressee should be filled or wrong sequence");
         }
     }
 
-    public EMailBuilder content(Content content) {
-        if (isSubjectFilled && isAddresseeFilled) {
-            if (!isContentFilled) {
-                this.content = new Content();
-                this.content.setBody(content.getBody());
-                isContentBodyFilled = true;
-                this.content.setSignature(content.getSignature());
-                isContentFilled = true;
-                return this;
-            } else {
-                throw new RuntimeException("Content have been already filled");
-            }
-        } else {
-            throw new RuntimeException("Subject and/or addressees should be filled");
-        }
-    }
+    public class FinalBuilder implements IFinalBuilder {
+        private String subject;
+        private String sender;
+        private Set<String> directAddressees;
+        private Set<String> copyAddressees;
+        private Content content;
 
-    public EMail build() {
-        if (!(isSubjectFilled
-                || isAddresseeFilled
-                || isContentBodyFilled)) {
-            throw new RuntimeException("Subject, addressee and body should be filled");
-        } else {
+        public FinalBuilder(String subject, String sender, Set<String> directAddressees, Set<String> copyAddressees, Content content) {
+            this.subject = subject;
+            this.sender = sender;
+            this.directAddressees = directAddressees;
+            this.copyAddressees = copyAddressees;
+            this.content = content;
+        }
+
+
+        @Override
+        public EMail build() {
             EMail eMail = new EMail();
-            eMail.setSubject(this.subject);
-            eMail.setSender(this.sender);
-            eMail.setDirectAddressees(this.directAddressees);
-            eMail.setCopyAddressees(this.copyAddressees);
-            eMail.setContent(this.content);
+            eMail.setSubject(subject);
+            eMail.setSender(sender);
+            eMail.setDirectAddressees(directAddressees);
+            eMail.setCopyAddressees(copyAddressees);
+            eMail.setContent(content);
             return eMail;
         }
+    }
+
+
+    public interface IFromToBuilder {
+        IFromToBuilder from(String sender);
+
+        ICopyToBuilder to(String addressee);
+
+        ICopyToBuilder toAll(String... addressees);
+    }
+
+    public interface ICopyToBuilder {
+        IContentBuilder copyTo(String addressee);
+
+        IContentBuilder copyToAll(String... addressees);
+
+        ICopyToBuilder to(String addressee);
+
+        ICopyToBuilder toAll(String... addressees);
+    }
+
+    public interface IContentBuilder {
+        IFinalBuilder content(Content content);
+
+        IContentBuilder copyTo(String addressee);
+
+        IContentBuilder copyToAll(String... addressees);
+    }
+
+    public interface IFinalBuilder {
+        EMail build();
     }
 }

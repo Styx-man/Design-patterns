@@ -18,7 +18,6 @@ public class Main {
 
         // проверяем, что отправитель заполняется по-дефолту
         EMail eMailOne = builder
-                .newLetter()
                 .subject("All star")
                 .to("Iliya")
                 .copyTo("Ignat")
@@ -29,7 +28,6 @@ public class Main {
 
         // проверяем, что значения получателей остаются уникальными
         EMail eMailTwo = builder
-                .newLetter()
                 .subject("To all")
                 .from("Ted")
                 .to("Jake")
