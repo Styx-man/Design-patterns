@@ -1,15 +1,15 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
- * Ferrari.
+ * Tesla.
  *
  * @author Denis_Lukashov
  */
-public class Ferrari extends Car {
+class Tesla extends Car {
 
     @Override
     void setModel() {
-        this.model = "Ferrari";
+        this.model = "Tesla";
     }
 
     @Override

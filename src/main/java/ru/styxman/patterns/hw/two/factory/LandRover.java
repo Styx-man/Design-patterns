@@ -1,11 +1,11 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
  * LandRover.
  *
  * @author Denis_Lukashov
  */
-public class LandRover extends Car {
+class LandRover extends Car {
 
     @Override
     void setModel() {

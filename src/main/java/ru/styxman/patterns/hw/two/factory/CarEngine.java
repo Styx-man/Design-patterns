@@ -1,4 +1,4 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
  * CarEngine.
@@ -6,8 +6,8 @@ package ru.styxman.patterns.dz.two;
  * @author Denis_Lukashov
  */
 public class CarEngine {
-    public String type;
-    public String power;
+    private String type;
+    private String power;
 
     public String getType() {
         return type;

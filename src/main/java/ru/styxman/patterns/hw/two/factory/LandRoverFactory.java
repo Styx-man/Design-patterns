@@ -1,11 +1,11 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
  * LandRoverFactory.
  *
  * @author Denis_Lukashov
  */
-public class LandRoverFactory implements CarFactory {
+class LandRoverFactory implements CarFactory {
 
     @Override
     public Car createCar(CarBody carBody, CarEngine carEngine, CarInterior carInterior) {

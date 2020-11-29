@@ -1,4 +1,4 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
  * CarInterior.
@@ -6,9 +6,9 @@ package ru.styxman.patterns.dz.two;
  * @author Denis_Lukashov
  */
 public class CarInterior {
-    public String name;
-    public String colour;
-    public String material;
+    private String name;
+    private String colour;
+    private String material;
 
     public String getName() {
         return name;

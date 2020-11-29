@@ -1,4 +1,4 @@
-package ru.styxman.patterns.dz.two;
+package ru.styxman.patterns.hw.two.factory;
 
 /**
  * CarBody.
@@ -6,9 +6,9 @@ package ru.styxman.patterns.dz.two;
  * @author Denis_Lukashov
  */
 public class CarBody {
-    public String name;
-    public String colour;
-    public String type;
+    private String name;
+    private String colour;
+    private String type;
 
     public String getName() {
         return name;

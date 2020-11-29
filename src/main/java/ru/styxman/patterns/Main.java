@@ -1,11 +1,7 @@
 package ru.styxman.patterns;
 
-import ru.styxman.patterns.dz.two.CarBody;
-import ru.styxman.patterns.dz.two.CarEngine;
-import ru.styxman.patterns.dz.two.CarFactory;
-import ru.styxman.patterns.dz.two.CarFactoryHelper;
-import ru.styxman.patterns.dz.two.CarInterior;
-import ru.styxman.patterns.dz.two.CarShop;
+import ru.styxman.patterns.hw.two.CarShop;
+import ru.styxman.patterns.hw.two.factory.*;
 
 /**
  * Main.
@@ -32,6 +28,5 @@ public class Main {
         CarShop carShop = new CarShop(carFactory, carBody, carEngine, carInterior);
 
         carShop.getCarInfo();
-
     }
 }
