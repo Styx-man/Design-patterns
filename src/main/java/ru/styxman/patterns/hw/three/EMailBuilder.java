@@ -9,21 +9,21 @@ import java.util.Set;
  */
 public class EMailBuilder {
 
-    public IFromToBuilder subject(String subject) {
-        return new FromToBuilder(subject);
+    public IFromBuilder subject(String subject) {
+        return new FromBuilder(subject);
     }
 
-    private class FromToBuilder implements IFromToBuilder {
+    private class FromBuilder implements IFromBuilder {
         private String subject;
         private String sender;
 
-        public FromToBuilder(String subject) {
+        public FromBuilder(String subject) {
             this.subject = subject;
             this.sender = "Denis";
         }
 
         @Override
-        public IFromToBuilder from(String sender) {
+        public IFromBuilder from(String sender) {
             this.sender = sender;
             return this;
         }
@@ -80,7 +80,7 @@ public class EMailBuilder {
         }
     }
 
-    public class ContentBuilder implements IContentBuilder {
+    private class ContentBuilder implements IContentBuilder {
         private String subject;
         private String sender;
         private Set<String> directAddressees = new HashSet<>();
@@ -107,11 +107,6 @@ public class EMailBuilder {
         }
 
         @Override
-        public IFinalBuilder content(Content content) {
-            return new FinalBuilder(subject, sender, directAddressees, copyAddressees, content);
-        }
-
-        @Override
         public IContentBuilder copyTo(String addressee) {
             this.copyAddressees.add(addressee);
             return this;
@@ -122,9 +117,14 @@ public class EMailBuilder {
             this.copyAddressees.addAll(Arrays.asList(addressees));
             return this;
         }
+
+        @Override
+        public IFinalBuilder content(Content content) {
+            return new FinalBuilder(subject, sender, directAddressees, copyAddressees, content);
+        }
     }
 
-    public class FinalBuilder implements IFinalBuilder {
+    private class FinalBuilder implements IFinalBuilder {
         private String subject;
         private String sender;
         private Set<String> directAddressees;
@@ -139,7 +139,6 @@ public class EMailBuilder {
             this.content = content;
         }
 
-
         @Override
         public EMail build() {
             EMail eMail = new EMail();
@@ -152,31 +151,28 @@ public class EMailBuilder {
         }
     }
 
+    public interface IFromBuilder extends IToBuilder {
+        IFromBuilder from(String sender);
+    }
 
-    public interface IFromToBuilder {
-        IFromToBuilder from(String sender);
-
+    public interface IToBuilder {
         ICopyToBuilder to(String addressee);
 
         ICopyToBuilder toAll(String... addressees);
     }
 
-    public interface ICopyToBuilder {
+    public interface ICopyBuilder {
         IContentBuilder copyTo(String addressee);
 
         IContentBuilder copyToAll(String... addressees);
-
-        ICopyToBuilder to(String addressee);
-
-        ICopyToBuilder toAll(String... addressees);
     }
 
-    public interface IContentBuilder {
+    public interface ICopyToBuilder extends ICopyBuilder, IToBuilder {
+
+    }
+
+    public interface IContentBuilder extends ICopyBuilder {
         IFinalBuilder content(Content content);
-
-        IContentBuilder copyTo(String addressee);
-
-        IContentBuilder copyToAll(String... addressees);
     }
 
     public interface IFinalBuilder {
